@@ -2,7 +2,7 @@ let todoItems = JSON.parse(localStorage.getItem('todos')) || [];
 const addBtn = document.getElementById('todo-addBtn');
 const todoList = document.getElementById('todo-list');
 const todoInput = document.getElementById('todo-input');
-renderItemsInTodo(todoItems);
+renderItemsInTodo(todoItems, todoList);
 
 addBtn.addEventListener('click', () => {
     const text = todoInput.value.trim();
@@ -23,27 +23,43 @@ todoInput.addEventListener('keydown', (e) => {
 })
 
 function addTodoItem(text) {
-    if(text !== '') {
+    if (text !== '') {
         const newTodo = {
             id: Date.now(),
             content: text,
             completed: false,
+            subTodos: []
         }
         todoItems.push(newTodo);
         localStorage.setItem('todos', JSON.stringify(todoItems));
-        renderItemsInTodo(todoItems);
+        renderItemsInTodo(todoItems, todoList);
     }
     todoInput.value = '';
-    todoInput.focus();
 }
 
-function renderItemsInTodo(itemArray) {
-    todoList.innerHTML = '';
+function addSubTodoItem(parentElement, text) {
+    if (text !== '') {
+        const newTodo = {
+            id: Date.now(),
+            content: text,
+            completed: false,
+            subTodos: []
+        }
+        parentElement.subTodos.push(newTodo);
+    }
+}
 
+function renderItemsInTodo(itemArray, parentElement, depth = 0) {
+    if (parentElement == todoList) {
+        parentElement.innerHTML = '';
+    }
     itemArray.forEach(todo => {
         const todoItem = document.createElement('li');
         todoItem.textContent = todo.content;
-    
+        if(todo.completed === true) {
+            todoItem.classList.add('completed');
+        }
+
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'X';
         deleteBtn.addEventListener('click', (e) => {
@@ -51,10 +67,47 @@ function renderItemsInTodo(itemArray) {
             todoItem.remove();
             todoItems = todoItems.filter(item => item.id !== todo.id);
             localStorage.setItem('todos', JSON.stringify(todoItems));
-            renderItemsInTodo(todoItems);
+            renderItemsInTodo(todoItems, todoList);
         });
 
-        todoList.appendChild(todoItem);
+        const completeBtn = document.createElement('button');
+        completeBtn.textContent = '✓';
+        completeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            todo.completed = !todo.completed;
+            localStorage.setItem('todos', JSON.stringify(todoItems));
+            renderItemsInTodo(todoItems, todoList);
+        });
+        
+        const addSubBtn = document.createElement('button');
+        addSubBtn.textContent = '+';
+        addSubBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            const temInput = document.createElement('input');
+            const temBtn = document.createElement('button');
+            temInput.placeholder = "세부 목표를 입력하세요."
+            temBtn.textContent = "추가"
+            todoItem.appendChild(temInput);
+            todoItem.appendChild(temBtn);
+            temBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = temInput.value;
+                addSubTodoItem(todo, text);
+                temInput.remove();
+                localStorage.setItem('todos', JSON.stringify(todoItems));
+                renderItemsInTodo(todoItems, todoList);
+                temBtn.remove();
+            })
+        });
+
+        parentElement.appendChild(todoItem);
         todoItem.appendChild(deleteBtn);
+        todoItem.appendChild(completeBtn);
+        todoItem.appendChild(addSubBtn);
+        if(todo.subTodos.length > 0) {
+            renderItemsInTodo(todo.subTodos, todoItem, depth + 1);
+        }
+        todoItem.style.paddingLeft = `${depth * 20}px`;
     });
 }
