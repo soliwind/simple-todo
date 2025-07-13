@@ -28,7 +28,8 @@ function addTodoItem(text) {
             id: Date.now(),
             content: text,
             completed: false,
-            subTodos: []
+            subTodos: [],
+            depth: 0
         }
         todoItems.push(newTodo);
         localStorage.setItem('todos', JSON.stringify(todoItems));
@@ -43,13 +44,14 @@ function addSubTodoItem(parentElement, text) {
             id: Date.now(),
             content: text,
             completed: false,
-            subTodos: []
+            subTodos: [],
+            depth: parentElement.depth + 1
         }
         parentElement.subTodos.push(newTodo);
     }
 }
 
-function renderItemsInTodo(itemArray, parentElement, depth = 0) {
+function renderItemsInTodo(itemArray, parentElement) {
     if (parentElement == todoList) {
         parentElement.innerHTML = '';
     }
@@ -65,7 +67,10 @@ function renderItemsInTodo(itemArray, parentElement, depth = 0) {
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             todoItem.remove();
-            todoItems = todoItems.filter(item => item.id !== todo.id);
+            const index = itemArray.findIndex(item => item.id === todo.id)
+            if (index > -1) {
+                itemArray.splice(index, 1);
+            }
             localStorage.setItem('todos', JSON.stringify(todoItems));
             renderItemsInTodo(todoItems, todoList);
         });
@@ -99,6 +104,17 @@ function renderItemsInTodo(itemArray, parentElement, depth = 0) {
                 renderItemsInTodo(todoItems, todoList);
                 temBtn.remove();
             })
+            temInput.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter'){
+                    e.stopPropagation();
+                    const text = temInput.value;
+                    addSubTodoItem(todo, text);
+                    temInput.remove();
+                    localStorage.setItem('todos', JSON.stringify(todoItems));
+                    renderItemsInTodo(todoItems, todoList);
+                    temBtn.remove();
+                }
+            })
         });
 
         parentElement.appendChild(todoItem);
@@ -106,8 +122,10 @@ function renderItemsInTodo(itemArray, parentElement, depth = 0) {
         todoItem.appendChild(completeBtn);
         todoItem.appendChild(addSubBtn);
         if(todo.subTodos.length > 0) {
-            renderItemsInTodo(todo.subTodos, todoItem, depth + 1);
+            renderItemsInTodo(todo.subTodos, todoItem);
         }
-        todoItem.style.paddingLeft = `${depth * 20}px`;
+        if(todo.depth != 0) {
+            todoItem.style.marginLeft = `${20}px`;
+        }
     });
 }
