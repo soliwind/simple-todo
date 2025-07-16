@@ -2,13 +2,16 @@ let todoItems = JSON.parse(localStorage.getItem('todos')) || [];
 const addBtn = document.getElementById('todo-addBtn');
 const todoList = document.getElementById('todo-list');
 const todoInput = document.getElementById('todo-input');
+let isInputActive = false;
 renderItemsInTodo(todoItems, todoList);
 
 addBtn.addEventListener('click', () => {
     const text = todoInput.value.trim();
-    if (text !== '') {
+    if (text !== '' && !isInputActive) {
+        isInputActive = true;
         todoInput.value = '';
         addTodoItem(text);
+        isInputActive = false;
     }
 });
 
@@ -66,6 +69,9 @@ function renderItemsInTodo(itemArray, parentElement) {
         deleteBtn.textContent = 'X';
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            if(isInputActive) {
+                return;
+            }
             todoItem.remove();
             const index = itemArray.findIndex(item => item.id === todo.id)
             if (index > -1) {
@@ -79,6 +85,9 @@ function renderItemsInTodo(itemArray, parentElement) {
         completeBtn.textContent = '✓';
         completeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            if(isInputActive) {
+                return;
+            }
             todo.completed = !todo.completed;
             localStorage.setItem('todos', JSON.stringify(todoItems));
             renderItemsInTodo(todoItems, todoList);
@@ -88,30 +97,42 @@ function renderItemsInTodo(itemArray, parentElement) {
         addSubBtn.textContent = '+';
         addSubBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-
+            if(isInputActive) {
+                return;
+            }
+            isInputActive = true;
             const temInput = document.createElement('input');
             const temBtn = document.createElement('button');
             temInput.placeholder = "세부 목표를 입력하세요."
             temBtn.textContent = "추가"
-            todoItem.appendChild(temInput);
-            todoItem.appendChild(temBtn);
+            parentElement.appendChild(temInput);
+            parentElement.appendChild(temBtn);
+            temInput.focus();
             temBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const text = temInput.value;
+                const text = temInput.value.trim();
+                if(text === '') {
+                    return;
+                }
                 addSubTodoItem(todo, text);
                 temInput.remove();
                 localStorage.setItem('todos', JSON.stringify(todoItems));
                 renderItemsInTodo(todoItems, todoList);
+                isInputActive = false;
                 temBtn.remove();
             })
             temInput.addEventListener('keydown', (e) => {
                 if(e.key === 'Enter'){
                     e.stopPropagation();
-                    const text = temInput.value;
+                    const text = temInput.value.trim();
+                    if(text === '') {
+                        return;
+                    }
                     addSubTodoItem(todo, text);
                     temInput.remove();
                     localStorage.setItem('todos', JSON.stringify(todoItems));
                     renderItemsInTodo(todoItems, todoList);
+                    isInputActive = false;
                     temBtn.remove();
                 }
             })
