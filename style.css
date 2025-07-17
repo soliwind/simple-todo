@@ -20,7 +20,7 @@ body {
 }
 
 header {
-    background-color: #f9fafb;
+    background-color: #f9f9f9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,7 +45,7 @@ h2 {
     outline: none;
     border-radius: 6px;
     border: 2px solid #dddddd;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 #todo-input:focus {
@@ -59,20 +59,43 @@ h2 {
 #todo-addBtn {
     height: 40px;
     width: 55px;
+}
+
+#tem-container {
+    height: 35px;
+    display: flex;
+}
+
+#tem-container > button {
+    width: 48px;
+    margin-left: 5px;
+}
+
+#tem-input {
+    padding: 10px;
+    outline: none;
+    border-radius: 6px;
+    border: 2px solid #dddddd;
+}
+
+#tem-input:focus {
+    border-color: #56a7f0;
+}
+
+#tem-input::placeholder {
+    color: #777777;
+}
+
+button {
+    cursor: pointer;
+    /*transition: background-color 0.3s ease, color 0.3s ease;*/
     border-radius: 6px;
     border: none;
-    background-color: #56a7f0;
-    color: #ffffff;
-    font-weight: 500;
-    cursor: pointer;
+    font-weight: 570;
 }
 
-#todo-addBtn:hover {
-    background-color: #4a90e2;
-}
-
-#todo-addBtn:active {
-    background-color: #3a83d4;
+button:active {
+    transition: none;
 }
 
 ul {
@@ -80,13 +103,79 @@ ul {
 }
 
 li {
-    background-color: aqua;
+    background-color: #f0f0f0;
     border-radius: 6px;
     margin-bottom: 10px;
-    width:100px;
+    height: 35px;
+    min-width: 100px;
+    display: inline-block;
+    text-align: center;
+    padding: 0 20px;
+    line-height: 35px;
+    border: 2px solid #dddddd;
+}
+
+.item-container {
     display: flex;
 }
 
+.button-container {
+    margin-top: 1px;
+    display: flex;
+    margin-left: 5px;
+}
+
+.button-container > button {
+    width: 33px;
+    height: 33px;
+    border: none;
+    margin-left: 5px;
+    border-radius: 6px;
+}
+
+.button-gray {
+    background-color: #dddddd;
+}
+
+.button-gray:hover {
+    background-color: #c5c5c5;
+}
+
+.button-gray:active {
+    background-color: #cccccc;
+}
+
+.button-blue {
+    background-color: #56a7f0;
+    color: #ffffff;
+}
+
+.button-blue:hover {
+    background-color: #4a90e2;
+}
+
+.button-blue:active {
+    background-color: #3a83d4;
+}
+
+.button-light-blue {
+    background-color: #82c0f6;
+    color: #ffffff;
+}
+
+.button-light-blue:hover {
+    background-color: #6fb4f2;
+}
+
+.button-light-blue:active {
+    background-color: #5ba8ef;
+}
+
 .completed {
-    color: red;
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.completed-button {
+    opacity: 0.5;
 }
